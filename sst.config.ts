@@ -101,13 +101,26 @@ export default $config({
     const queues: Record<string, sst.aws.Queue> = {};
     const dlqs: Record<string, sst.aws.Queue> = {};
 
+    // Armazenar funções criadas
+    const functions: Record<string, sst.aws.Function> = {};
+
     for (const config of configs) {
       if (config.event.type === "http") {
         const route = `${config.event.method} ${config.event.path}`;
-        api.route(route, {
+        
+        // Criar função com nome semântico
+        const functionName = `${$app.name}-${$app.stage}-${config.name}`;
+        functions[config.name] = new sst.aws.Function(config.name, {
           handler: config.handler,
           environment,
+          transform: {
+            function: {
+              name: functionName,
+            },
+          },
         });
+
+        api.route(route, functions[config.name].arn);
       }
 
       if (config.event.type === "sqs") {
@@ -147,13 +160,19 @@ export default $config({
           };
         }
 
-        queues[queueName].subscribe(
-          {
-            handler: config.handler,
-            environment,
+        // Criar função com nome semântico para SQS
+        const functionName = `${$app.name}-${$app.stage}-${config.name}`;
+        functions[config.name] = new sst.aws.Function(config.name, {
+          handler: config.handler,
+          environment,
+          transform: {
+            function: {
+              name: functionName,
+            },
           },
-          subscriberOptions
-        );
+        });
+
+        queues[queueName].subscribe(functions[config.name].arn, subscriberOptions);
       }
     }
 

@@ -9,6 +9,26 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "createUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "deleteUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "getUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "listUsers": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "updateUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
   }
 }
 /// <reference path="sst-env.d.ts" />
