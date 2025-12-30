@@ -1,0 +1,25 @@
+{
+  "name": "poc-sst-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "sst dev",
+    "deploy:staging": "sst deploy --stage staging",
+    "deploy:production": "sst deploy --stage production",
+    "remove:staging": "sst remove --stage staging",
+    "remove:production": "sst remove --stage production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "mongodb": "^7.0.0",
+    "sst": "3.17.25"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.159"
+  }
+}

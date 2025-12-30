@@ -1,0 +1,50 @@
+{
+    "routes": [
+        {
+            "name": "createUser",
+            "handler": "src/interfaces/http/user/create.handler",
+            "event": {
+                "type": "http",
+                "path": "/users",
+                "method": "POST"
+            }
+        },
+        {
+            "name": "listUsers",
+            "handler": "src/interfaces/http/user/list.handler",
+            "event": {
+                "type": "http",
+                "path": "/users",
+                "method": "GET"
+            }
+        },
+        {
+            "name": "getUser",
+            "handler": "src/interfaces/http/user/get.handler",
+            "event": {
+                "type": "http",
+                "path": "/users/{id}",
+                "method": "GET"
+            }
+        },
+        {
+            "name": "updateUser",
+            "handler": "src/interfaces/http/user/update.handler",
+            "event": {
+                "type": "http",
+                "path": "/users/{id}",
+                "method": "PUT"
+            }
+        },
+        {
+            "name": "deleteUser",
+            "handler": "src/interfaces/http/user/delete.handler",
+            "event": {
+                "type": "http",
+                "path": "/users/{id}",
+                "method": "DELETE"
+            }
+        }
+    ]
+}
+
