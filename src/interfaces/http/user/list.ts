@@ -7,6 +7,7 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
   try {
     const useCase = container.listUsersUseCase();
     const users = await useCase.execute();
+    console.log("users", users);
 
     return success(users);
   } catch (error) {

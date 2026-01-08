@@ -1,0 +1,8 @@
+{
+  "debug.javascript.autoAttachFilter": "always",
+  "debug.javascript.autoAttachSmartPattern": [
+    "${workspaceFolder}/**",
+    "!**/node_modules/**"
+  ]
+}
+
