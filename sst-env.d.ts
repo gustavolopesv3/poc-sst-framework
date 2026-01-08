@@ -9,6 +9,10 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "ApprovalUserQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "createUser": {
       "name": string
       "type": "sst.aws.Function"
@@ -25,7 +29,19 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "registerUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "updateUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "userApprovalTriggerFn": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "validateUser": {
       "name": string
       "type": "sst.aws.Function"
     }

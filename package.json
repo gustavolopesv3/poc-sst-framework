@@ -16,6 +16,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-sfn": "^3.958.0",
     "mongodb": "^7.0.0",
     "sst": "3.17.25"
   },

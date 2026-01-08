@@ -1,0 +1,28 @@
+{
+    "routes": [
+        {
+            "name": "validateUser",
+            "handler": "src/interfaces/stepfunctions/user-approval/validate.handler",
+            "event": {
+                "type": "stepfunction"
+            }
+        },
+        {
+            "name": "registerUser",
+            "handler": "src/interfaces/stepfunctions/user-approval/register.handler",
+            "event": {
+                "type": "stepfunction"
+            }
+        },
+        {
+            "name": "userApprovalTrigger",
+            "handler": "src/interfaces/stepfunctions/user-approval/trigger.handler",
+            "event": {
+                "type": "sqs",
+                "queueName": "ApprovalUserQueue",
+                "batchSize": 1
+            }
+        }
+    ]
+}
+

@@ -4,7 +4,7 @@ interface RouteConfig {
   name: string;
   handler: string;
   event: {
-    type: "http" | "sqs";
+    type: "http" | "sqs" | "stepfunction";
     path?: string;
     method?: string;
     queueName?: string;
@@ -104,25 +104,189 @@ export default $config({
     // Armazenar funções criadas
     const functions: Record<string, sst.aws.Function> = {};
 
+    // Primeiro passo: criar todas as funções (exceto userApprovalTrigger que é criada depois)
+    for (const config of configs) {
+      // Pular userApprovalTrigger - será criado com configurações especiais
+      if (config.name === "userApprovalTrigger") {
+        continue;
+      }
+
+      const functionName = `${$app.name}-${$app.stage}-${config.name}`;
+      
+      functions[config.name] = new sst.aws.Function(config.name, {
+        handler: config.handler,
+        environment,
+        transform: {
+          function: {
+            name: functionName,
+          },
+        },
+      });
+    }
+
+    // ============================================
+    // Step Function: User Approval Workflow
+    // ============================================
+    const validateUserFn = functions["validateUser"];
+    const registerUserFn = functions["registerUser"];
+
+    let workflow: aws.sfn.StateMachine | undefined;
+
+    if (validateUserFn && registerUserFn) {
+      // IAM Role para Step Function
+      const stepFunctionRole = new aws.iam.Role("UserApprovalWorkflowRole", {
+        assumeRolePolicy: JSON.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: {
+                Service: "states.amazonaws.com",
+              },
+              Action: "sts:AssumeRole",
+            },
+          ],
+        }),
+      });
+
+      // Policy para invocar Lambdas
+      new aws.iam.RolePolicy("UserApprovalWorkflowPolicy", {
+        role: stepFunctionRole.id,
+        policy: $interpolate`{
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["lambda:InvokeFunction"],
+              "Resource": [
+                "${validateUserFn.arn}",
+                "${registerUserFn.arn}"
+              ]
+            }
+          ]
+        }`,
+      });
+
+      // Definição da Step Function
+      const definition = $interpolate`{
+        "Comment": "User Approval Workflow - Validates and registers users",
+        "StartAt": "ValidateUser",
+        "States": {
+          "ValidateUser": {
+            "Type": "Task",
+            "Resource": "${validateUserFn.arn}",
+            "Next": "CheckValidation",
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Next": "ValidationFailed"
+              }
+            ]
+          },
+          "CheckValidation": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.isValid",
+                "BooleanEquals": true,
+                "Next": "RegisterUser"
+              }
+            ],
+            "Default": "ValidationFailed"
+          },
+          "RegisterUser": {
+            "Type": "Task",
+            "Resource": "${registerUserFn.arn}",
+            "End": true,
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Next": "RegistrationFailed"
+              }
+            ]
+          },
+          "ValidationFailed": {
+            "Type": "Fail",
+            "Error": "ValidationError",
+            "Cause": "User validation failed"
+          },
+          "RegistrationFailed": {
+            "Type": "Fail",
+            "Error": "RegistrationError",
+            "Cause": "User registration failed"
+          }
+        }
+      }`;
+
+      workflow = new aws.sfn.StateMachine("UserApprovalWorkflow", {
+        name: `${$app.name}-${$app.stage}-UserApprovalWorkflow`,
+        roleArn: stepFunctionRole.arn,
+        definition,
+      });
+
+      // Criar trigger com link para Step Function
+      const triggerFunctionName = `${$app.name}-${$app.stage}-userApprovalTrigger`;
+      
+      // IAM Role para Lambda invocar Step Function e ler SQS
+      const triggerRole = new aws.iam.Role("UserApprovalTriggerRole", {
+        assumeRolePolicy: JSON.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: {
+                Service: "lambda.amazonaws.com",
+              },
+              Action: "sts:AssumeRole",
+            },
+          ],
+        }),
+        managedPolicyArns: [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
+        ],
+      });
+
+      new aws.iam.RolePolicy("UserApprovalTriggerPolicy", {
+        role: triggerRole.id,
+        policy: $interpolate`{
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["states:StartExecution"],
+              "Resource": "${workflow.arn}"
+            }
+          ]
+        }`,
+      });
+
+      // Recriar função trigger com as permissões corretas
+      functions["userApprovalTrigger"] = new sst.aws.Function("userApprovalTriggerFn", {
+        handler: "src/interfaces/stepfunctions/user-approval/trigger.handler",
+        environment: {
+          ...environment,
+          STEP_FUNCTION_ARN: workflow.arn,
+        },
+        transform: {
+          function: {
+            name: triggerFunctionName,
+            role: triggerRole.arn,
+          },
+        },
+      });
+    }
+
+    // Segundo passo: configurar rotas HTTP
     for (const config of configs) {
       if (config.event.type === "http") {
         const route = `${config.event.method} ${config.event.path}`;
-        
-        // Criar função com nome semântico
-        const functionName = `${$app.name}-${$app.stage}-${config.name}`;
-        functions[config.name] = new sst.aws.Function(config.name, {
-          handler: config.handler,
-          environment,
-          transform: {
-            function: {
-              name: functionName,
-            },
-          },
-        });
-
         api.route(route, functions[config.name].arn);
       }
+    }
 
+    // Terceiro passo: configurar filas SQS
+    for (const config of configs) {
       if (config.event.type === "sqs") {
         const queueName = config.event.queueName!;
 
@@ -160,24 +324,13 @@ export default $config({
           };
         }
 
-        // Criar função com nome semântico para SQS
-        const functionName = `${$app.name}-${$app.stage}-${config.name}`;
-        functions[config.name] = new sst.aws.Function(config.name, {
-          handler: config.handler,
-          environment,
-          transform: {
-            function: {
-              name: functionName,
-            },
-          },
-        });
-
         queues[queueName].subscribe(functions[config.name].arn, subscriberOptions);
       }
     }
 
     return {
       apiUrl: api.url,
+      ...(workflow && { UserApprovalWorkflowArn: workflow.arn }),
       ...Object.fromEntries(
         Object.entries(queues).map(([name, queue]) => [`${name}Url`, queue.url])
       ),
