@@ -8,6 +8,10 @@ export function validateCreateUser(body: Partial<CreateUserDTO>): APIGatewayProx
     return badRequest("Name is required");
   }
 
+  if (body.name.trim().length < 2) {
+    return badRequest("Name must have at least 2 characters");
+  }
+
   if (!body.email?.trim()) {
     return badRequest("Email is required");
   }
@@ -26,6 +30,10 @@ export function validateCreateUser(body: Partial<CreateUserDTO>): APIGatewayProx
 export function validateUpdateUser(body: Partial<UpdateUserDTO>): APIGatewayProxyResultV2 | null {
   if (!body.name?.trim() && !body.email?.trim() && !body.password) {
     return badRequest("At least name, email or password must be provided");
+  }
+
+  if (body.name && body.name.trim().length < 2) {
+    return badRequest("Name must have at least 2 characters");
   }
 
   if (body.password && body.password.length < 6) {

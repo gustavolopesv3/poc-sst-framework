@@ -16,11 +16,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@aws-sdk/client-sfn": "^3.958.0",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0",
-    "sst": "3.17.25"
+    "sst": "3.17.25",
+    "swagger-ui-dist": "^5.31.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.159",

@@ -7,8 +7,16 @@
                 "type": "http",
                 "path": "/auth/login",
                 "method": "POST"
+            },
+            "docs": {
+                "summary": "Login",
+                "description": "Autentica o usuário e retorna JWT",
+                "requestSchema": "LoginRequest",
+                "responses": {
+                    "200": { "description": "Login OK", "schema": "LoginResponse" },
+                    "401": { "description": "Credenciais inválida", "schema": "ErrorResponse" }
+                }
             }
         }
     ]
 }
-

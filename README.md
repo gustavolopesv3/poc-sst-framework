@@ -12,6 +12,8 @@ POC de uma API Serverless usando **SST v3** com arquitetura **DDD (Domain-Driven
 - **Node.js 22** - Runtime
 - **JWT** - Autenticação via tokens
 - **bcryptjs** - Hash de senhas
+- **Zod** - Validação de schemas
+- **Swagger UI** - Documentação interativa da API
 
 ## 📁 Estrutura do Projeto (DDD)
 
@@ -54,7 +56,14 @@ src/
         │   ├── response.ts          # Helpers de resposta HTTP
         │   ├── request-parser.ts    # Parsing de body e parâmetros
         │   ├── error-handler.ts     # Tratamento centralizado de erros
-        │   └── container.ts         # Injeção de dependências
+        │   ├── container.ts         # Injeção de dependências
+        │   ├── openapi.ts           # Gerador OpenAPI spec
+        │   └── schemas/
+        │       └── user.schema.ts   # Schemas Zod para validação
+        ├── docs/
+        │   ├── swagger-ui.ts        # GET /docs (Swagger UI)
+        │   ├── openapi-json.ts      # GET /docs/openapi.json
+        │   └── provider.conf.json
         ├── auth/
         │   ├── login.ts             # POST /auth/login
         │   └── provider.conf.json   # Configuração das rotas de auth
@@ -129,6 +138,20 @@ npm run remove:staging
 
 # Production
 npm run remove:production
+```
+
+## 📚 Documentação da API
+
+Acesse a documentação interativa (Swagger UI):
+
+```
+GET /docs
+```
+
+Ou obtenha a especificação OpenAPI em JSON:
+
+```
+GET /docs/openapi.json
 ```
 
 ## 📡 API Endpoints

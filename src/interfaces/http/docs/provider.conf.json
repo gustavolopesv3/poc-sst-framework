@@ -1,0 +1,23 @@
+{
+    "routes": [
+        {
+            "name": "swaggerUI",
+            "handler": "src/interfaces/http/docs/swagger-ui.handler",
+            "event": {
+                "type": "http",
+                "path": "/docs",
+                "method": "GET"
+            }
+        },
+        {
+            "name": "openapiJson",
+            "handler": "src/interfaces/http/docs/openapi-json.handler",
+            "event": {
+                "type": "http",
+                "path": "/docs/openapi.json",
+                "method": "GET"
+            }
+        }
+    ]
+}
+

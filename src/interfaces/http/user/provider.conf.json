@@ -7,6 +7,16 @@
                 "type": "http",
                 "path": "/users",
                 "method": "POST"
+            },
+            "docs": {
+                "summary": "Criar usuário",
+                "description": "Cria um novo usuário no sistema",
+                "requestSchema": "CreateUserRequest",
+                "responses": {
+                    "201": { "description": "Usuário criado", "schema": "UserResponse" },
+                    "400": { "description": "Dados inválidos", "schema": "ErrorResponse" },
+                    "409": { "description": "Email já existe", "schema": "ErrorResponse" }
+                }
             }
         },
         {
@@ -16,6 +26,13 @@
                 "type": "http",
                 "path": "/users",
                 "method": "GET"
+            },
+            "docs": {
+                "summary": "Listar usuários",
+                "description": "Retorna todos os usuários",
+                "responses": {
+                    "200": { "description": "Lista de usuários", "schema": "[UserResponse]" }
+                }
             }
         },
         {
@@ -25,6 +42,14 @@
                 "type": "http",
                 "path": "/users/{id}",
                 "method": "GET"
+            },
+            "docs": {
+                "summary": "Buscar usuário",
+                "description": "Retorna um usuário pelo ID",
+                "responses": {
+                    "200": { "description": "Dados do usuário", "schema": "UserResponse" },
+                    "404": { "description": "Não encontrado", "schema": "ErrorResponse" }
+                }
             }
         },
         {
@@ -34,6 +59,17 @@
                 "type": "http",
                 "path": "/users/{id}",
                 "method": "PUT"
+            },
+            "docs": {
+                "summary": "Atualizar usuário",
+                "description": "Atualiza os dados de um usuário",
+                "requestSchema": "UpdateUserRequest",
+                "responses": {
+                    "200": { "description": "Usuário atualizado", "schema": "UserResponse" },
+                    "400": { "description": "Dados inválidos", "schema": "ErrorResponse" },
+                    "404": { "description": "Não encontrado", "schema": "ErrorResponse" },
+                    "409": { "description": "Email já existe", "schema": "ErrorResponse" }
+                }
             }
         },
         {
@@ -43,8 +79,15 @@
                 "type": "http",
                 "path": "/users/{id}",
                 "method": "DELETE"
+            },
+            "docs": {
+                "summary": "Deletar usuário",
+                "description": "Remove um usuário do sistema",
+                "responses": {
+                    "204": { "description": "Usuário deletado" },
+                    "404": { "description": "Não encontrado", "schema": "ErrorResponse" }
+                }
             }
         }
     ]
 }
-

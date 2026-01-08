@@ -33,7 +33,15 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "openapiJson": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "registerUser": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "swaggerUI": {
       "name": string
       "type": "sst.aws.Function"
     }
