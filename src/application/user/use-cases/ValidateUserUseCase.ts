@@ -28,6 +28,14 @@ export class ValidateUserUseCase {
       };
     }
 
+    // Validar senha
+    if (!data.password || data.password.length < 6) {
+      return {
+        isValid: false,
+        reason: "Password must have at least 6 characters",
+      };
+    }
+
     // Verificar se email já existe
     const existingUser = await this.userRepository.findByEmail(data.email);
     if (existingUser) {
@@ -43,5 +51,3 @@ export class ValidateUserUseCase {
     };
   }
 }
-
-

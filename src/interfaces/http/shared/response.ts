@@ -32,6 +32,14 @@ export function badRequest(message: string): APIGatewayProxyResultV2 {
   };
 }
 
+export function unauthorized(message = "Unauthorized"): APIGatewayProxyResultV2 {
+  return {
+    statusCode: 401,
+    headers: defaultHeaders,
+    body: JSON.stringify({ error: message }),
+  };
+}
+
 export function notFound(message: string): APIGatewayProxyResultV2 {
   return {
     statusCode: 404,
@@ -55,4 +63,3 @@ export function serverError(message = "Internal server error"): APIGatewayProxyR
     body: JSON.stringify({ error: message }),
   };
 }
-

@@ -4,6 +4,7 @@ import { GetUserUseCase } from "../../../application/user/use-cases/GetUserUseCa
 import { ListUsersUseCase } from "../../../application/user/use-cases/ListUsersUseCase";
 import { UpdateUserUseCase } from "../../../application/user/use-cases/UpdateUserUseCase";
 import { DeleteUserUseCase } from "../../../application/user/use-cases/DeleteUserUseCase";
+import { LoginUseCase } from "../../../application/user/use-cases/LoginUseCase";
 
 // Simple dependency injection container
 // In a larger project, use a DI library like tsyringe or inversify
@@ -16,5 +17,5 @@ export const container = {
   listUsersUseCase: () => new ListUsersUseCase(userRepository),
   updateUserUseCase: () => new UpdateUserUseCase(userRepository),
   deleteUserUseCase: () => new DeleteUserUseCase(userRepository),
+  loginUseCase: () => new LoginUseCase(userRepository),
 };
-

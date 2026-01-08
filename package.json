@@ -17,10 +17,15 @@
   "type": "commonjs",
   "dependencies": {
     "@aws-sdk/client-sfn": "^3.958.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0",
     "sst": "3.17.25"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.159"
+    "@types/aws-lambda": "8.10.159",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.9.3"
   }
 }

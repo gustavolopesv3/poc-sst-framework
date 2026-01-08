@@ -1,0 +1,14 @@
+{
+    "routes": [
+        {
+            "name": "login",
+            "handler": "src/interfaces/http/auth/login.handler",
+            "event": {
+                "type": "http",
+                "path": "/auth/login",
+                "method": "POST"
+            }
+        }
+    ]
+}
+

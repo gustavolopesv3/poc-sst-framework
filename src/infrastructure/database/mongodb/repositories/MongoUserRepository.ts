@@ -7,6 +7,7 @@ interface UserDocument {
   _id?: ObjectId;
   name: string;
   email: string;
+  passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,11 +23,13 @@ export class MongoUserRepository implements IUserRepository {
     return this.collection;
   }
 
-  private toEntity(doc: UserDocument): User {
+  private async toEntity(doc: UserDocument): Promise<User> {
     return User.create({
       id: doc._id?.toString(),
       name: doc.name,
       email: doc.email,
+      password: "",
+      passwordHash: doc.passwordHash,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
@@ -36,6 +39,7 @@ export class MongoUserRepository implements IUserRepository {
     return {
       name: user.name,
       email: user.email.value,
+      passwordHash: user.password.hash,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -51,6 +55,8 @@ export class MongoUserRepository implements IUserRepository {
       id: result.insertedId.toString(),
       name: document.name,
       email: document.email,
+      password: "",
+      passwordHash: document.passwordHash,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     });
@@ -87,7 +93,7 @@ export class MongoUserRepository implements IUserRepository {
     const collection = await this.getCollection();
     const documents = await collection.find().toArray();
 
-    return documents.map((doc) => this.toEntity(doc));
+    return Promise.all(documents.map((doc) => this.toEntity(doc)));
   }
 
   async update(user: User): Promise<User> {
@@ -107,4 +113,3 @@ export class MongoUserRepository implements IUserRepository {
     await collection.deleteOne({ _id: new ObjectId(id) });
   }
 }
-

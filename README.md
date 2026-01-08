@@ -10,6 +10,8 @@ POC de uma API Serverless usando **SST v3** com arquitetura **DDD (Domain-Driven
 - **AWS Lambda** - Funções serverless
 - **API Gateway** - Gerenciamento de APIs
 - **Node.js 22** - Runtime
+- **JWT** - Autenticação via tokens
+- **bcryptjs** - Hash de senhas
 
 ## 📁 Estrutura do Projeto (DDD)
 
@@ -20,7 +22,8 @@ src/
 │       ├── entity/
 │       │   └── User.ts              # Entidade User
 │       ├── value-objects/
-│       │   └── Email.ts             # Value Object Email
+    │       │   ├── Email.ts             # Value Object Email
+    │       │   └── Password.ts          # Value Object Password (hash)
 │       ├── repository/
 │       │   └── IUserRepository.ts   # Interface do repositório
 │       └── errors/
@@ -31,11 +34,12 @@ src/
 │       ├── dtos/
 │       │   └── UserDTO.ts           # DTOs de entrada/saída
 │       └── use-cases/
-│           ├── CreateUserUseCase.ts
-│           ├── GetUserUseCase.ts
-│           ├── ListUsersUseCase.ts
-│           ├── UpdateUserUseCase.ts
-│           └── DeleteUserUseCase.ts
+    │           ├── CreateUserUseCase.ts
+    │           ├── GetUserUseCase.ts
+    │           ├── ListUsersUseCase.ts
+    │           ├── UpdateUserUseCase.ts
+    │           ├── DeleteUserUseCase.ts
+    │           └── LoginUseCase.ts
 │
 ├── infrastructure/                  # Camada de Infraestrutura
 │   └── database/
@@ -51,6 +55,9 @@ src/
         │   ├── request-parser.ts    # Parsing de body e parâmetros
         │   ├── error-handler.ts     # Tratamento centralizado de erros
         │   └── container.ts         # Injeção de dependências
+        ├── auth/
+        │   ├── login.ts             # POST /auth/login
+        │   └── provider.conf.json   # Configuração das rotas de auth
         └── user/
             ├── validators/
             │   └── user-validators.ts
@@ -126,6 +133,14 @@ npm run remove:production
 
 ## 📡 API Endpoints
 
+### Autenticação
+
+| Método | Path | Descrição |
+|--------|------|-----------|
+| POST | `/auth/login` | Login do usuário |
+
+### Usuários
+
 | Método | Path | Descrição |
 |--------|------|-----------|
 | POST | `/users` | Criar usuário |
@@ -137,10 +152,27 @@ npm run remove:production
 ### Exemplos
 
 ```bash
-# Criar usuário
+# Criar usuário (com senha)
 curl -X POST https://<api-url>/users \
   -H "Content-Type: application/json" \
-  -d '{"name": "João Silva", "email": "joao@email.com"}'
+  -d '{"name": "João Silva", "email": "joao@email.com", "password": "senha123"}'
+
+# Login
+curl -X POST https://<api-url>/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "joao@email.com", "password": "senha123"}'
+
+# Resposta do login:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": {
+#     "id": "...",
+#     "name": "João Silva",
+#     "email": "joao@email.com",
+#     "createdAt": "...",
+#     "updatedAt": "..."
+#   }
+# }
 
 # Listar usuários
 curl https://<api-url>/users
@@ -148,10 +180,10 @@ curl https://<api-url>/users
 # Buscar usuário
 curl https://<api-url>/users/<id>
 
-# Atualizar usuário
+# Atualizar usuário (pode incluir nova senha)
 curl -X PUT https://<api-url>/users/<id> \
   -H "Content-Type: application/json" \
-  -d '{"name": "João Santos"}'
+  -d '{"name": "João Santos", "password": "novasenha123"}'
 
 # Deletar usuário
 curl -X DELETE https://<api-url>/users/<id>

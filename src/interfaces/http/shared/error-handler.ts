@@ -1,6 +1,11 @@
 import type { APIGatewayProxyResultV2 } from "aws-lambda";
-import { UserNotFoundError, UserAlreadyExistsError, InvalidUserDataError } from "../../../domain/user/errors/UserErrors";
-import { badRequest, notFound, conflict, serverError } from "./response";
+import {
+  UserNotFoundError,
+  UserAlreadyExistsError,
+  InvalidUserDataError,
+  InvalidCredentialsError,
+} from "../../../domain/user/errors/UserErrors";
+import { badRequest, notFound, conflict, serverError, unauthorized } from "./response";
 
 export function handleError(error: unknown, context: string): APIGatewayProxyResultV2 {
   console.error(`Error in ${context}:`, error);
@@ -17,10 +22,17 @@ export function handleError(error: unknown, context: string): APIGatewayProxyRes
     return badRequest(error.message);
   }
 
+  if (error instanceof InvalidCredentialsError) {
+    return unauthorized(error.message);
+  }
+
   if (error instanceof Error && error.message.includes("Invalid email")) {
+    return badRequest(error.message);
+  }
+
+  if (error instanceof Error && error.message.includes("Password must have")) {
     return badRequest(error.message);
   }
 
   return serverError();
 }
-

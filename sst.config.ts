@@ -92,6 +92,8 @@ export default $config({
     const environment = {
       MONGODB_URI: process.env.MONGODB_URI || "mongodb://localhost:27017",
       MONGODB_DB_NAME: process.env.MONGODB_DB_NAME || "poc-sst",
+      JWT_SECRET: process.env.JWT_SECRET || "poc-sst-secret-key-change-in-production",
+      JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "24h",
     };
 
     // API Gateway para rotas HTTP

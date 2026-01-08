@@ -12,12 +12,24 @@ export function validateCreateUser(body: Partial<CreateUserDTO>): APIGatewayProx
     return badRequest("Email is required");
   }
 
+  if (!body.password) {
+    return badRequest("Password is required");
+  }
+
+  if (body.password.length < 6) {
+    return badRequest("Password must have at least 6 characters");
+  }
+
   return null;
 }
 
 export function validateUpdateUser(body: Partial<UpdateUserDTO>): APIGatewayProxyResultV2 | null {
-  if (!body.name?.trim() && !body.email?.trim()) {
-    return badRequest("At least name or email must be provided");
+  if (!body.name?.trim() && !body.email?.trim() && !body.password) {
+    return badRequest("At least name, email or password must be provided");
+  }
+
+  if (body.password && body.password.length < 6) {
+    return badRequest("Password must have at least 6 characters");
   }
 
   return null;

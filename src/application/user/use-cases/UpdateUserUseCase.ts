@@ -25,9 +25,12 @@ export class UpdateUserUseCase {
       user.updateName(data.name);
     }
 
+    if (data.password) {
+      await user.updatePassword(data.password);
+    }
+
     const updatedUser = await this.userRepository.update(user);
 
     return updatedUser.toJSON() as UserResponseDTO;
   }
 }
-
