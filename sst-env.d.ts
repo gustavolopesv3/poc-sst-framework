@@ -29,6 +29,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "login": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "registerUser": {
       "name": string
       "type": "sst.aws.Function"
